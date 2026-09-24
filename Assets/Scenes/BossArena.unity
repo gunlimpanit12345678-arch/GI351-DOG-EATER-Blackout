@@ -2475,13 +2475,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackLaser
   inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   projectilePrefab: {fileID: 1000000000000000000, guid: 7a9f3c1e5b2d4a6c8e0f123456789abc, type: 3}
-  projectileSpawnPoint: {fileID: 1055998960}
+  attackPoint: {fileID: 0}
   playerSanity: {fileID: 225527978}
   projectileSpeed: 18
   projectileDamage: 25
   projectileLifetime: 2
   fireCooldown: 0.15
-  sanityCostPerShot: 2
+  sanityCostPercent: 15
 --- !u!114 &225527973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2497,6 +2497,7 @@ MonoBehaviour:
   attackPoint: {fileID: 1055998960}
   cam: {fileID: 401836608}
   rotationSpeed: 30
+  attackPointRotationOffset: -90
 --- !u!114 &225527974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2509,10 +2510,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d2c4f6a1b3e5d7f9c0a2e4b6d8f1a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldStability
-  maxStability: 100
   decayPerEnemyPerSecond: 0.1
   stabilityGainOnKill: 5
   scanInterval: 0.25
+  unstabilizerMultiplierPerMonster: 1
+  maxUnstabilizerMultiplier: 3
 --- !u!114 &225527975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2546,8 +2548,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDamageReceiver
   playerHealth: {fileID: 225527979}
   playerAbilities: {fileID: 225527977}
-  spriteRenderer: {fileID: 225527983}
-  flickDuration: 0.2
+  hurtFlashFrameDuration: 10
 --- !u!114 &225527977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2562,11 +2563,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAbilities
   inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   playerSanity: {fileID: 225527978}
+  playerController: {fileID: 0}
   shieldVisual: {fileID: 679486824}
-  shieldSanityCost: 25
-  shieldDuration: 3
-  flickerWarningTime: 1
-  flickerInterval: 0.1
+  hitSanityCostPercent: 25
+  shieldSpeedMultiplier: 0.5
+  sanityRunSpeedMultiplier: 1.1
+  sanityDrainPercentPerSecond: 3
 --- !u!114 &225527978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2608,6 +2610,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   speed: 5
   sprintSpeed: 10
+  rechargeSlowdownMultiplier: 0.85
   inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!136 &225527981
 CapsuleCollider:
@@ -11820,9 +11823,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f6a8c2e1b3d5f7a9c0e2d4b6f8a1c3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StabilityUI
-  worldStability: {fileID: 225527974}
-  stabilityFillImage: {fileID: 383737420}
-  stabilityText: {fileID: 534747189}
 --- !u!114 &1010850401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11835,9 +11835,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b3d7f1a5c8e42d6b0f4a9c1e7d50368, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthUI
-  playerHealth: {fileID: 225527979}
-  healthFillImage: {fileID: 1598193287}
-  healthText: {fileID: 1424735312}
 --- !u!114 &1010850402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11850,14 +11847,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c4b2c9e6f0d4a8ab1e3c5d7f9a2b6e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PanicBlackoutUI
-  worldStability: {fileID: 225527974}
-  topEdge: {fileID: 449433111}
-  bottomEdge: {fileID: 1836689496}
-  leftEdge: {fileID: 28875557}
-  rightEdge: {fileID: 1648724320}
+  playerPanic: {fileID: 0}
   globalVolume: {fileID: 0}
-  maximumBlackoutSize: 0.2
+  enableStabilityBlackout: 0
+  worldStability: {fileID: 225527974}
+  warningThreshold: 70
+  criticalThreshold: 30
+  warningVignetteIntensity: 0.48
+  criticalVignetteIntensity: 0.72
+  depletedVignetteIntensity: 1
+  blackoutSmoothness: 0.45
+  baseVignetteIntensity: 0.2
   maximumVignetteIntensity: 0.65
+  baseVignetteSmoothness: 0.2
+  maximumVignetteSmoothness: 0.55
   responseSpeed: 8
 --- !u!114 &1010850403
 MonoBehaviour:
@@ -11871,9 +11874,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46e95207a417b0542bcb3f52d7684704, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SanityUI
-  playerSanity: {fileID: 225527978}
-  sanityFillImage: {fileID: 1418244963}
-  sanityText: {fileID: 825707039}
 --- !u!4 &1010850404
 Transform:
   m_ObjectHideFlags: 0
